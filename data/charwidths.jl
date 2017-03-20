@@ -99,7 +99,7 @@ for line in readlines(open("EastAsianWidth.txt"))
 
     #Assign widths
     for c in charstart:charend
-        if width=="W" || width=="F" # wide or full
+        if width=="W" || width=="F" || width=="A" # wide or full or ambiguous
             CharWidths[c]=2
         elseif width=="Na"|| width=="H"
             CharWidths[c]=1
