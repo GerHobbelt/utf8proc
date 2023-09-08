@@ -1,0 +1,5 @@
+cc_library(
+    name = "bench",
+    srcs = ["bench.c", "util.c", "util.h"],
+    deps = ["//src:utf8proc"]
+)

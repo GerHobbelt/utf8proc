@@ -1,3 +1,7 @@
+.bazel
+bazel-*
+*.gz
+
 *.tar.gz
 *.exe
 *.dll

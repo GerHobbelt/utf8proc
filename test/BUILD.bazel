@@ -1,0 +1,130 @@
+load("//data:BUILD.bzl", "UNICODE_VERSION")
+
+COPTS = [
+    "-std=c99",
+    "-fPIC",
+    "-Wsign-conversion", "-Wall", "-Wextra",
+    "-pedantic"
+]
+
+TIMEOUT = "short"
+
+test_suite(
+    name = "test",
+    tests = [
+        ":case_test",
+        ":charwidth_test",
+        ":custom_test",
+        ":grapheme_break_test",
+        ":iscase_test",
+        ":iterate_test",
+        ":misc_test",
+        ":normalization_test",
+        ":print_property_test",
+        ":valid_test"
+    ]
+)
+
+cc_test(
+    name = "case_test",
+    srcs = ["case.c"],
+    deps = ["//src:utf8proc", ":tests"],
+    copts = COPTS,
+    defines = ["UTF8PROC_EXPORTS"],
+    timeout = TIMEOUT
+)
+
+cc_test(
+    name = "charwidth_test",
+    srcs = ["charwidth.c"],
+    deps = ["//src:utf8proc", ":tests"],
+    copts = COPTS,
+    defines = ["UTF8PROC_EXPORTS"],
+    timeout = TIMEOUT
+)
+
+cc_test(
+    name = "custom_test",
+    srcs = ["custom.c"],
+    deps = ["//src:utf8proc", ":tests"],
+    copts = COPTS,
+    defines = ["UTF8PROC_EXPORTS"],
+    timeout = TIMEOUT
+)
+
+cc_test(
+    name = "grapheme_break_test",
+    srcs = ["graphemetest.c"],
+    deps = ["//src:utf8proc", ":tests"],
+    copts = COPTS,
+    defines = ["UTF8PROC_EXPORTS"],
+    data = ["@grapheme_break_test//file"],
+    args = ["$(location @grapheme_break_test//file)"],
+    timeout = TIMEOUT
+)
+
+cc_test(
+    name = "iscase_test",
+    srcs = ["iscase.c"],
+    deps = ["//src:utf8proc", ":tests"],
+    copts = COPTS,
+    defines = ["UTF8PROC_EXPORTS"],
+    data = ["//data:Lowercase.txt", "//data:Uppercase.txt"],
+    args = ["$(location //data:Lowercase.txt)",
+            "$(location //data:Uppercase.txt)"],
+    timeout = TIMEOUT
+)
+
+cc_test(
+    name = "iterate_test",
+    srcs = ["iterate.c"],
+    deps = ["//src:utf8proc", ":tests"],
+    copts = COPTS,
+    defines = ["UTF8PROC_EXPORTS"],
+    timeout = TIMEOUT
+)
+
+cc_test(
+    name = "normalization_test",
+    srcs = ["normtest.c"],
+    deps = ["//src:utf8proc", ":tests"],
+    copts = COPTS,
+    defines = ["UTF8PROC_EXPORTS"],
+    data = ["@normalization_test//file"],
+    args = ["$(location @normalization_test//file)"],
+    timeout = TIMEOUT
+)
+
+cc_test(
+    name = "misc_test",
+    srcs = ["misc.c"],
+    deps = ["//src:utf8proc", ":tests"],
+    copts = COPTS + [
+        "-DUNICODE_VERSION='\"'" + UNICODE_VERSION + "'\"'"
+    ],
+    defines = ["UTF8PROC_EXPORTS"],
+    timeout = TIMEOUT
+)
+
+cc_test(
+    name = "print_property_test",
+    srcs = ["printproperty.c"],
+    deps = ["//src:utf8proc", ":tests"],
+    copts = COPTS,
+    defines = ["UTF8PROC_EXPORTS"],
+    timeout = TIMEOUT
+)
+
+cc_test(
+    name = "valid_test",
+    srcs = ["valid.c"],
+    deps = ["//src:utf8proc", ":tests"],
+    copts = COPTS,
+    defines = ["UTF8PROC_EXPORTS"],
+    timeout = TIMEOUT
+)
+
+cc_library(
+    name = "tests",
+    srcs = ["tests.c", "tests.h", "//:utf8proc.h"],
+)

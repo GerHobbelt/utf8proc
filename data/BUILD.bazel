@@ -1,0 +1,31 @@
+## Read DerivedCoreProperties.txt and emit:
+##   Lowercase.txt - all lines between:
+# Derived Property: Lowercase
+# and
+# Total code points:
+
+##   Uppercase.txt - all lines between:
+# then:
+# Derived Property: Uppercase
+# and
+# Total code points:
+
+genrule(
+    name = "cases",
+    srcs = ["@derived_core_properties//file"],
+    outs = ["Lowercase.txt", "Uppercase.txt"],
+    cmd  = " ".join([
+        "$(execpath :splitter)",
+        "$(location @derived_core_properties//file);",
+        "cp Lowercase.txt $(RULEDIR);",
+        "cp Uppercase.txt $(RULEDIR);"
+    ]),
+    tools = [":splitter"],
+    visibility = ["//test:__pkg__"]
+)
+
+cc_binary(
+    name = "splitter",
+    srcs = ["derived_core_properties_splitter.c"]
+)
+
