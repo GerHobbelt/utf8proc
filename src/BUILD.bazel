@@ -1,9 +1,7 @@
 cc_library(
     name = "utf8proc",
-    srcs = ["//:utf8proc.c","//:utf8proc.h"],
+    srcs = ["//:utf8proc.c"],
+    hdrs = ["//:utf8proc.h"],
     additional_compiler_inputs = ["//:utf8proc_data.c"],
-    visibility = [
-        "//bench:__pkg__",
-        "//test:__pkg__",
-    ]
+    visibility = ["//visibility:public"]
 )

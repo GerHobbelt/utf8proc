@@ -19,7 +19,6 @@ def _icu_impl(ctx):
     version = ctx.modules[0].tags.files[0].version
 
     for k,v in filenames.items():
-        print("k: %s" % k)
         http_file(name = k,
                   url  = "https://www.unicode.org/Public/{}/{}".format(
                   version, v))
