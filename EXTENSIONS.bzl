@@ -28,9 +28,9 @@ def _icu_impl(ctx):
 
     version = ctx.modules[0].tags.files[0].version
 
-    print("VERSION: %s" % version)
+    # print("VERSION: %s" % version)
     for k,v in datafiles.items():
-        print("K: %s" % k)
+        # print("K: %s" % k)
         http_file(name = k,
                   url  = "https://www.unicode.org/Public/{}/{}".format(version, v.file),
                   sha256 = v.sha256

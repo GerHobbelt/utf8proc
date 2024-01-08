@@ -1,9 +1,9 @@
 module(
     name = "utf8proc",
-    version = "2.8.0",
+    version = "2.8.0.bzl.1",
     compatibility_level = 2,
 )
-bazel_dep(name = "platforms", version = "0.0.7")
+bazel_dep(name = "platforms", version = "0.0.8")
 
 icu = use_extension("//:EXTENSIONS.bzl", "icu")
 icu.files(version = "15.0.0")
