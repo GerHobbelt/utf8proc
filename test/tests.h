@@ -9,7 +9,9 @@
 #define _XOPEN_SOURCE 700
 
 /* silence warnings about sscanf on Windows */
+#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
