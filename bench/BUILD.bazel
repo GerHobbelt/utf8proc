@@ -1,5 +1,7 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 cc_library(
     name = "bench",
     srcs = ["bench.c", "util.c", "util.h"],
-    deps = ["//src:utf8proc"]
+    deps = ["//lib:utf8proc"]
 )
