@@ -1,8 +1,8 @@
 # utf8proc release history #
 
-## Version 2.11.0 ##
+## Version 2.11.0-alpha ##
 
-2025-06-20
+TBD — awaiting final Unicode 17 release.
 
  - Unicode 17 support ([#292]).
 
