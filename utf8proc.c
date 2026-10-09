@@ -370,7 +370,7 @@ static utf8proc_int32_t seqindex_decode_index(const utf8proc_uint32_t seqindex)
   return seqindex_decode_entry(&entry);
 }
 
-static utf8proc_ssize_t seqindex_write_char_decomposed(utf8proc_uint16_t seqindex, utf8proc_int32_t *dst, utf8proc_ssize_t bufsize, unsigned int options, int *last_boundclass) {
+static utf8proc_ssize_t seqindex_write_char_decomposed(utf8proc_uint16_t seqindex, utf8proc_int32_t *dst, utf8proc_ssize_t bufsize, unsigned int options, utf8proc_int32_t *last_boundclass) {
   utf8proc_ssize_t written = 0;
   const utf8proc_uint16_t *entry = &utf8proc_sequences[seqindex & 0x3FFF];
   int len = seqindex >> 14;
@@ -382,8 +382,7 @@ static utf8proc_ssize_t seqindex_write_char_decomposed(utf8proc_uint16_t seqinde
     utf8proc_int32_t entry_cp = seqindex_decode_entry(&entry);
 
     utf8proc_ssize_t decomp_result = utf8proc_decompose_char(entry_cp, dst ? dst+written : dst,
-      (bufsize > written) ? (bufsize - written) : 0, options,
-    last_boundclass);
+      (bufsize > written) ? (bufsize - written) : 0, options, last_boundclass);
     if (decomp_result < 0) return decomp_result;
     written += decomp_result;
   }
@@ -443,7 +442,7 @@ UTF8PROC_DLLEXPORT const char *utf8proc_category_string(utf8proc_int32_t c) {
   return utf8proc_decompose_char((replacement_uc), dst, bufsize, \
                                  options & ~(unsigned int)UTF8PROC_LUMP, last_boundclass)
 
-UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose_char(utf8proc_int32_t uc, utf8proc_int32_t *dst, utf8proc_ssize_t bufsize, unsigned int options, int *last_boundclass) {
+UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose_char(utf8proc_int32_t uc, utf8proc_int32_t *dst, utf8proc_ssize_t bufsize, unsigned int options, utf8proc_int32_t *last_boundclass) {
   const utf8proc_property_t *property;
   utf8proc_propval_t category;
   utf8proc_int32_t hangul_sindex;
@@ -554,7 +553,7 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose_custom(
     utf8proc_int32_t uc;
     utf8proc_ssize_t rpos = 0;
     utf8proc_ssize_t decomp_result;
-    int boundclass = UTF8PROC_BOUNDCLASS_START;
+    utf8proc_int32_t boundclass = UTF8PROC_BOUNDCLASS_START;
     while (1) {
       if (options & UTF8PROC_NULLTERM) {
         utf8proc_ssize_t nread = utf8proc_iterate(str + rpos, -1, &uc);
@@ -783,15 +782,24 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_map_custom(
 ) {
   utf8proc_int32_t *buffer;
   utf8proc_ssize_t result;
+  utf8proc_ssize_t bufsize;
   *dstptr = NULL;
-  result = utf8proc_decompose_custom(str, strlen, NULL, 0, options, custom_func, custom_data);
-  if (result < 0) return result;
-  buffer = (utf8proc_int32_t *) malloc(((utf8proc_size_t)result) * sizeof(utf8proc_int32_t) + 1);
+  bufsize = utf8proc_decompose_custom(str, strlen, NULL, 0, options, custom_func, custom_data);
+  if (bufsize < 0) return bufsize;
+  buffer = (utf8proc_int32_t *) malloc(((utf8proc_size_t)bufsize) * sizeof(utf8proc_int32_t) + 1);
   if (!buffer) return UTF8PROC_ERROR_NOMEM;
-  result = utf8proc_decompose_custom(str, strlen, buffer, result, options, custom_func, custom_data);
+  result = utf8proc_decompose_custom(str, strlen, buffer, bufsize, options, custom_func, custom_data);
   if (result < 0) {
     free(buffer);
     return result;
+  }
+  /* a custom_func that returns different results across the two decompose
+     passes can make the second pass longer than the buffer we sized from the
+     first; reencode would then read and write past the allocation, so bail
+     out instead of corrupting the heap */
+  if (result > bufsize) {
+    free(buffer);
+    return UTF8PROC_ERROR_OVERFLOW;
   }
   result = utf8proc_reencode(buffer, result, options);
   if (result < 0) {
