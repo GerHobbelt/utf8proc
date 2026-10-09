@@ -14,6 +14,14 @@ unreleased
 - New `utf8proc_free` function to free memory allocated by utf8proc ([#338]).
   (You can also use your own memory allocator by calling lower-level APIs.)
 
+- `utf8proc_normalize_utf32` can now handle invalid codepoints ≥ 0x110000.
+  They are passed through unchanged rather than dropped, and composition never
+  runs across one ([#352], [#355]).
+
+- Fix `UTF8PROC_CHARBOUND` emitting no `0xff` grapheme markers when combined
+  with `UTF8PROC_COMPOSE` or `UTF8PROC_DECOMPOSE`, a regression in 2.11.3
+  ([#355]).
+
 - [Zig](https://ziglang.org/learn/build-system/) build scripts ([#351]).
 
 - Minor build-system improvements ([#326], [#327], [#334], [#338]).
@@ -514,5 +522,7 @@ Release of version 1.0.1
 [#334]: https://github.com/JuliaStrings/utf8proc/issues/334
 [#338]: https://github.com/JuliaStrings/utf8proc/issues/338
 [#351]: https://github.com/JuliaStrings/utf8proc/issues/351
+[#352]: https://github.com/JuliaStrings/utf8proc/issues/352
 [#353]: https://github.com/JuliaStrings/utf8proc/issues/353
 [#354]: https://github.com/JuliaStrings/utf8proc/issues/354
+[#355]: https://github.com/JuliaStrings/utf8proc/issues/355
